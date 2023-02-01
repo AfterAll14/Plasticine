@@ -293,7 +293,7 @@ namespace Plasticine
         }
     }
 
-    public abstract class NeuralNetworkData
+    public abstract class NeuralNetworkData : CustomSerializable
     {
         abstract public real[] GetInput();
 
