@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31829.152
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plasticine", "Plasticine.csproj", "{82BBBFDE-0A76-4349-8B10-5C3B2E72C8D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plasticine", "Plasticine.csproj", "{82BBBFDE-0A76-4349-8B10-5C3B2E72C8D2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EasySerializer", "..\EasySerializer\EasySerializer.csproj", "{496BDC19-DA79-49B6-9ABE-EABB522DB266}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{82BBBFDE-0A76-4349-8B10-5C3B2E72C8D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{82BBBFDE-0A76-4349-8B10-5C3B2E72C8D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{82BBBFDE-0A76-4349-8B10-5C3B2E72C8D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{496BDC19-DA79-49B6-9ABE-EABB522DB266}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{496BDC19-DA79-49B6-9ABE-EABB522DB266}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{496BDC19-DA79-49B6-9ABE-EABB522DB266}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{496BDC19-DA79-49B6-9ABE-EABB522DB266}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

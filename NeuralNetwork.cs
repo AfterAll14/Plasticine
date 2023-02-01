@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EasySerializer;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -6,7 +7,7 @@ using real = System.Double;
 
 namespace Plasticine
 {
-    public class Layer
+    public class Layer : CustomSerializable
     {
         public Layer previousLayer { get; private set; }
 
@@ -21,19 +22,27 @@ namespace Plasticine
         real[][] weightDeltas;
         real[] biasesDeltas;
 
-        public real[] activations { get; private set; }
-        public real[] input { get; private set; }
+        public real[] activatedNeuronsValues { get; private set; }
+        public real[] inputActivations { get; private set; }
         public real[] activationsDerivatives { get; private set; }
 
         real[][][] dZdZ_matrices;
 
-        Func<real[], int, (real, real)> activationFunction;
+        public Func<real[], int, (real, real)> activationFunction;
 
         public int neurons
         {
             get
             {
                 return biases == null ? 0 : biases.Length;
+            }
+        }
+
+        public int activations
+        {
+            get
+            {
+                return weights == null ? 0 : weights[0].Length;
             }
         }
 
@@ -62,7 +71,7 @@ namespace Plasticine
             }
 
             weightedSums = new real[neurons];
-            this.activations = new real[neurons];
+            this.activatedNeuronsValues = new real[neurons];
             activationsDerivatives = new real[neurons];
 
             InitializeWeightsAndBiases();
@@ -140,7 +149,7 @@ namespace Plasticine
             if (input.Length != weights[0].Length)
                 throw new Exception("Layer::Propagate - activation input length doesn't match layer activations");
 
-            this.input = input;
+            this.inputActivations = input;
 
             for (int neuronId = 0; neuronId < neurons; neuronId++)
             {
@@ -154,7 +163,7 @@ namespace Plasticine
 
             for (int neuronId = 0; neuronId < neurons; neuronId++)
             {
-                (activations[neuronId], activationsDerivatives[neuronId]) = activationFunction(weightedSums, neuronId);
+                (activatedNeuronsValues[neuronId], activationsDerivatives[neuronId]) = activationFunction(weightedSums, neuronId);
             }
         }
 
@@ -212,7 +221,7 @@ namespace Plasticine
                         {
                             real sum = 0;
 
-                            for (int inputId = 0; inputId < input.Length; inputId++)
+                            for (int inputId = 0; inputId < inputActivations.Length; inputId++)
                                 sum += weights[neuronId][inputId] * previousLayer.activationsDerivatives[inputId] * previousLayer.Get_dZdZ(layerId - 1, inputId, iteratedLayerNeuronId);
 
                             dZdZ_matrix[neuronId][iteratedLayerNeuronId] = sum;
@@ -266,6 +275,22 @@ namespace Plasticine
 
             ResetAccumulation();
         }
+
+        public override void WriteValues(BinaryDataWriter binaryWriter)
+        {
+            binaryWriter.Write(biases);
+
+            for (int i = 0; i < weights.Length; i++)
+                binaryWriter.Write(weights[i]);
+        }
+
+        public override void ReadValues(BinaryDataReader binaryReader)
+        {
+            biases = binaryReader.ReadDoubleArray();
+
+            for (int i = 0; i < weights.Length; i++)
+                weights[i] = binaryReader.ReadDoubleArray();
+        }
     }
 
     public abstract class NeuralNetworkData
@@ -277,7 +302,7 @@ namespace Plasticine
         abstract public real CalculateResultAccuracy(real[] nnOuput);
     }
 
-    public class NeuralNetwork
+    public class NeuralNetwork : CustomSerializable
     {
         List<Layer> layers;
         Layer finalLayer;
@@ -313,14 +338,19 @@ namespace Plasticine
             this.momentumCoefficient = momentumCoefficient;
         }
 
+        public NeuralNetwork(string filePath)
+        {
+            ReadFromFile(filePath);
+        }
+
         public real[] CalculateResults(NeuralNetworkData data)
         {
             for (int i = 0; i < layers.Count; i++)
             {
-                layers[i].Activate(i == 0 ? data.GetInput() : layers[i - 1].activations);
+                layers[i].Activate(i == 0 ? data.GetInput() : layers[i - 1].activatedNeuronsValues);
             }
 
-            return layers[layers.Count - 1].activations;
+            return layers[layers.Count - 1].activatedNeuronsValues;
         }
 
         (real, real[]) CostFunction(real[] results, real[] correctResults)
@@ -390,9 +420,9 @@ namespace Plasticine
 
                 targetLayer.AccumulateBiasGradient(targetNeuronId, dCdBi);
 
-                for (int targetWeightId = 0; targetWeightId < targetLayer.input.Length; targetWeightId++)
+                for (int targetWeightId = 0; targetWeightId < targetLayer.inputActivations.Length; targetWeightId++)
                 {
-                    real dCdWij = targetLayer.input[targetWeightId] * dCdBi;
+                    real dCdWij = targetLayer.inputActivations[targetWeightId] * dCdBi;
                     targetLayer.AccumulateWeightGradient(targetNeuronId, targetWeightId, dCdWij);
                 }
             }
@@ -414,6 +444,50 @@ namespace Plasticine
                 layers[i].CopyWeightsAndBiases(neuralNetwork.layers[i]);
 
             batchCounter = 0;
+        }
+
+        public override void WriteValues(BinaryDataWriter binaryWriter)
+        {
+            binaryWriter.Write(minTrainingCoefficient);
+            binaryWriter.Write(batchSize);
+            binaryWriter.Write(momentumCoefficient);
+            binaryWriter.Write(layers.Count);
+
+            for (int i = 0; i < layers.Count; i++)
+            {
+                Layer layer = layers[i];
+
+                binaryWriter.Write(layer.activations);
+                binaryWriter.Write(layer.neurons);
+                binaryWriter.Write(layer.activationFunction.Method.Name);
+                layer.WriteValues(binaryWriter);
+            }
+        }
+
+        public override void ReadValues(BinaryDataReader binaryReader)
+        {
+            minTrainingCoefficient = binaryReader.ReadDouble();
+            batchSize = binaryReader.ReadInt();
+            momentumCoefficient = binaryReader.ReadDouble();
+            int layersCount = binaryReader.ReadInt();
+
+            layers = new List<Layer>();
+
+            for (int i = 0; i < layersCount; i++)
+            {
+                int layerActivations = binaryReader.ReadInt();
+                int layerNeurons = binaryReader.ReadInt();
+                
+                string layerActivationFunctionName = binaryReader.ReadString();
+                Func<real[], int, (real, real)> layerActivationFunction = (Func<real[], int, (real, real)>)typeof(ActivationFunctions).GetMethod(layerActivationFunctionName).CreateDelegate(typeof(Func<real[], int, (real, real)>));
+
+                Layer layer = i == 0 ? new Layer(layerActivations, layerNeurons, layerActivationFunction) : new Layer(layers[i - 1], layerNeurons, layerActivationFunction);
+                layer.ReadValues(binaryReader);
+
+                layers.Add(layer);
+            }
+
+            finalLayer = layers[layers.Count - 1];
         }
     }
 
