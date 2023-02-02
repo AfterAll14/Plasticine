@@ -10,7 +10,7 @@ namespace Plasticine
     {
         static object consoleLock = new object();
 
-        public static void EvolveNetwork(NeuralNetwork neuralNetwork, int epochs, int offspringsCount, real offspringDiversity, List<NeuralNetworkData> trainingDataSet, List<NeuralNetworkData> testDataSet)
+        public static void TrainNetwork(NeuralNetwork neuralNetwork, int epochs, int offspringsCount, real offspringDiversity, List<NeuralNetworkData> trainingDataSet, List<NeuralNetworkData> testDataSet)
         {
             Console.WriteLine("Started training...");
 
@@ -34,7 +34,7 @@ namespace Plasticine
                     string name = "Offspring " + (i + 1);
                     int cursorTopI = cursorTop + i;
 
-                    Task<real> trainingTask = Task<real>.Factory.StartNew(() => TrainNetwork(offspring, name, trainingDataSet, testDataSet, cursorTopI));
+                    Task<real> trainingTask = Task<real>.Factory.StartNew(() => ProcessEpoch(offspring, name, trainingDataSet, testDataSet, cursorTopI));
 
                     offsprings.Add(offspring);
                     trainingTasks.Add(trainingTask);
@@ -71,7 +71,7 @@ namespace Plasticine
             Console.WriteLine("Training complete! Achieved accuracy " + globalWinnerAccuracy.ToString("0.00") + "%");
         }
 
-        static real TrainNetwork(NeuralNetwork neuralNetwork, string name, List<NeuralNetworkData> trainingDataSet, List<NeuralNetworkData> testDataSet, int cursorTop)
+        static real ProcessEpoch(NeuralNetwork neuralNetwork, string name, List<NeuralNetworkData> trainingDataSet, List<NeuralNetworkData> testDataSet, int cursorTop)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
@@ -106,11 +106,11 @@ namespace Plasticine
                 }
             }
 
-            real accuracy = TestNetwork(neuralNetwork, name, testDataSet, cursorTop, stopwatch);
+            real accuracy = CalculateAccuracy(neuralNetwork, name, testDataSet, cursorTop, stopwatch);
             return accuracy;
         }
 
-        static real TestNetwork(NeuralNetwork neuralNetwork, string name, List<NeuralNetworkData> testDataSet, int cursorTop, Stopwatch stopwatch)
+        static real CalculateAccuracy(NeuralNetwork neuralNetwork, string name, List<NeuralNetworkData> testDataSet, int cursorTop, Stopwatch stopwatch)
         {
             real totalResults = 0;
             real correctResults = 0;
