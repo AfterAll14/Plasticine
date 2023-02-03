@@ -17,6 +17,13 @@ namespace Plasticine
             return weightedSums[valueId] < 0 ? (0, 0) : (weightedSums[valueId], 1);
         }
 
+        public static (real, real) LeakyReLU(real[] weightedSums, int valueId)
+        {
+            real value = weightedSums[valueId];
+            real slope = value < 0 ? (real)0.01 : (real)1;
+            return (value * slope, slope);
+        }
+
         public static (real, real) SoftMax(real[] weightedSums, int valueId)
         {
             real maxSum = weightedSums[0];
