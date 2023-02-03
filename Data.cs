@@ -11,29 +11,32 @@ namespace Plasticine
 
         public NeuralNetworkData(real[] input, real[] correctResults, bool normalizeAutomatically = false)
         {
-            this.input = input;
-            this.correctResults = correctResults;
+            this.input = new real[input.Length];
+            Array.Copy(input, this.input, input.Length);
+
+            this.correctResults = new real[correctResults.Length];
+            Array.Copy(correctResults, this.correctResults, correctResults.Length);
 
             if (normalizeAutomatically)
             {
-                real minValue = input[0];
-                real maxValue = input[0];
+                real minValue = this.input[0];
+                real maxValue = this.input[0];
 
-                for (int i = 1; i < input.Length; i++)
+                for (int i = 1; i < this.input.Length; i++)
                 {
-                    if (input[i] < minValue)
-                        minValue = input[i];
+                    if (this.input[i] < minValue)
+                        minValue = this.input[i];
 
-                    if (input[i] > maxValue)
-                        maxValue = input[i];
+                    if (this.input[i] > maxValue)
+                        maxValue = this.input[i];
                 }
 
                 real range = maxValue - minValue;
 
                 if (range != (real)0.0)
                 {
-                    for (int i = 0; i < input.Length; i++)
-                        input[i] = (input[i] - minValue) / range;
+                    for (int i = 0; i < this.input.Length; i++)
+                        this.input[i] = (this.input[i] - minValue) / range;
                 }
             }
         }
