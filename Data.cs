@@ -9,7 +9,7 @@ namespace Plasticine
         protected real[] input;
         protected real[] correctResults;
 
-        public NeuralNetworkData(real[] input, real[] correctResults, bool normalizeAutomatically = false)
+        public NeuralNetworkData(real[] input, real[] correctResults, bool normalizeInputAutomatically = false)
         {
             this.input = new real[input.Length];
             Array.Copy(input, this.input, input.Length);
@@ -17,7 +17,7 @@ namespace Plasticine
             this.correctResults = new real[correctResults.Length];
             Array.Copy(correctResults, this.correctResults, correctResults.Length);
 
-            if (normalizeAutomatically)
+            if (normalizeInputAutomatically)
             {
                 real minValue = this.input[0];
                 real maxValue = this.input[0];
