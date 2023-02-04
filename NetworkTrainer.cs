@@ -10,7 +10,8 @@ namespace Plasticine
     {
         static object consoleLock = new object();
 
-        public static void TrainNetwork(NeuralNetwork neuralNetwork, int epochs, int offspringsCount, real offspringDiversity, List<NeuralNetworkData> trainingDataSet, List<NeuralNetworkData> testDataSet)
+        public static void TrainNetwork<T>(NeuralNetwork neuralNetwork, int epochs, int offspringsCount, real offspringDiversity, List<T> trainingDataSet, List<T> testDataSet)
+            where T : NeuralNetworkData
         {
             Console.WriteLine("Started training...");
 
@@ -71,13 +72,14 @@ namespace Plasticine
             Console.WriteLine("Training complete! Achieved accuracy " + globalWinnerAccuracy.ToString("0.00") + "%");
         }
 
-        static real ProcessEpoch(NeuralNetwork neuralNetwork, string name, List<NeuralNetworkData> trainingDataSet, List<NeuralNetworkData> testDataSet, int cursorTop)
+        static real ProcessEpoch<T>(NeuralNetwork neuralNetwork, string name, List<T> trainingDataSet, List<T> testDataSet, int cursorTop)
+            where T : NeuralNetworkData
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
             for (int i = 0; i < trainingDataSet.Count; i++)
             {
-                NeuralNetworkData trainingData = trainingDataSet[i];
+                T trainingData = trainingDataSet[i];
 
                 try
                 {
@@ -110,7 +112,8 @@ namespace Plasticine
             return accuracy;
         }
 
-        static real CalculateAccuracy(NeuralNetwork neuralNetwork, string name, List<NeuralNetworkData> testDataSet, int cursorTop, Stopwatch stopwatch)
+        static real CalculateAccuracy<T>(NeuralNetwork neuralNetwork, string name, List<T> testDataSet, int cursorTop, Stopwatch stopwatch)
+            where T : NeuralNetworkData
         {
             real totalResults = 0;
             real correctResults = 0;
@@ -118,7 +121,7 @@ namespace Plasticine
 
             for (int i = 0; i < testDataSet.Count; i++)
             {
-                NeuralNetworkData testData = testDataSet[i];
+                T testData = testDataSet[i];
 
                 real[] results = neuralNetwork.CalculateResults(testData);
 
