@@ -4,7 +4,7 @@ Validation results: achieved 97.5% accuracy on MNIST handwritten digits dataset 
 
 Example usage:
 
-```
+```C#
 // init datasets
 List<NeuralNetworkData> trainingDataSet = new List<NeuralNetworkData>();
 List<NeuralNetworkData> testDataSet = new List<NeuralNetworkData>();
