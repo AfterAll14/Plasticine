@@ -5,6 +5,13 @@ Validation results: achieved 97.5% accuracy on MNIST handwritten digits dataset 
 Example usage:
 
 ```
+// init datasets
+List<NeuralNetworkData> trainingDataSet = new List<NeuralNetworkData>();
+List<NeuralNetworkData> testDataSet = new List<NeuralNetworkData>();
+
+// add data to datasets or load from file
+SomeFunctionToLoadData(trainingDataSet, testDataSet);
+
 // neural network parameters
 int inputNeurons = 784;
 int layer1Neurons = 128;
