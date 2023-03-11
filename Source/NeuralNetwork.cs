@@ -48,9 +48,14 @@ namespace Plasticine
 
         public real[] CalculateResults(NeuralNetworkData data)
         {
+            return CalculateResults(data.GetInput());
+        }
+
+        public real[] CalculateResults(real[] input)
+        {
             for (int i = 0; i < layers.Count; i++)
             {
-                layers[i].Activate(i == 0 ? data.GetInput() : layers[i - 1].activatedNeuronsValues);
+                layers[i].Activate(i == 0 ? input : layers[i - 1].activatedNeuronsValues);
             }
 
             return layers[layers.Count - 1].activatedNeuronsValues;
