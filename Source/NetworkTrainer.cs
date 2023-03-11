@@ -18,7 +18,7 @@ namespace Plasticine
             List<NeuralNetwork> offsprings = new List<NeuralNetwork>();
             List<Task<real>> trainingTasks = new List<Task<real>>();
 
-            real globalWinnerAccuracy = 0;
+            real globalWinnerAccuracy = -1;
             NeuralNetwork globalWinner = null;
 
             for (int epoch = 0; epoch < epochs; epoch++)
@@ -42,7 +42,7 @@ namespace Plasticine
                 }
 
                 NeuralNetwork winner = null;
-                real winnerAccuracy = 0;
+                real winnerAccuracy = -1;
 
                 for (int i = 0; i < trainingTasks.Count; i++)
                 {
