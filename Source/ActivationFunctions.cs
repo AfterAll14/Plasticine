@@ -8,8 +8,10 @@ namespace Plasticine
         public static (real, real) Sigmoid(real[] weightedSums, int valueId)
         {
             real exp = Utils.ExpClamped(weightedSums[valueId]);
+            real y = exp / (exp + 1);
+            real dydx = y * ((real)1.0 - y);
 
-            return (exp / (exp + 1), exp / ((exp + 1) * (exp + 1)));
+            return (y, dydx);
         }
 
         public static (real, real) ReLU(real[] weightedSums, int valueId)
@@ -38,17 +40,8 @@ namespace Plasticine
 
             real valueExp = Utils.ExpClamped(weightedSums[valueId] - maxSum);
 
-            //Utils.Check(valueExp);
-            //Utils.Check(dividerSum);
-            //Utils.Check(valueExp * dividerSum);
-            //Utils.Check(valueExp + dividerSum);
-            //Utils.Check((dividerSum + valueExp) * (dividerSum + valueExp));
-
             real result = valueExp / (dividerSum + valueExp);
-            real resultDerivative = dividerSum * valueExp / ((dividerSum + valueExp) * (dividerSum + valueExp));
-
-            //Utils.Check(result);
-            //Utils.Check(resultDerivative);
+            real resultDerivative = result * ((real)1.0 - result);
 
             return (result, resultDerivative);
         }
