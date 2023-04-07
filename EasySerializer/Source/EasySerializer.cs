@@ -42,6 +42,14 @@ namespace EasySerializer
                 throw new Exception("Trying to read invalid data");
         }
 
+        public void PatchSavedData(string filePath)
+        {
+            BinaryDataReader dataReader = new BinaryDataReader(File.ReadAllBytes(filePath));
+            ReadValues(dataReader);
+            WriteToFile(filePath);
+            Console.WriteLine("\"" + filePath + "\" patched!");
+        }
+
         public static void WriteItemToFile(CustomSerializable item, string filePath, int maxSizeMB = 32)
         {
             BinaryDataWriter dataWriter = new BinaryDataWriter(new byte[1024 * 1024 * maxSizeMB]);
