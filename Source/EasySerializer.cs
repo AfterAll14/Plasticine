@@ -21,6 +21,7 @@ namespace EasySerializer
         {
             BinaryDataWriter dataWriter = new BinaryDataWriter(new byte[1024 * 1024 * maxSizeMB]);
 
+            dataWriter.Write(true);
             WriteValues(dataWriter);
 
             if (!File.Exists(filePath))
@@ -35,14 +36,17 @@ namespace EasySerializer
         public void ReadFromFile(string filePath)
         {
             BinaryDataReader dataReader = new BinaryDataReader(File.ReadAllBytes(filePath));
-            ReadValues(dataReader);
+            if (dataReader.ReadBool())
+                ReadValues(dataReader);
+            else
+                throw new Exception("Trying to read invalid data");
         }
 
         public static void WriteItemToFile(CustomSerializable item, string filePath, int maxSizeMB = 32)
         {
             BinaryDataWriter dataWriter = new BinaryDataWriter(new byte[1024 * 1024 * maxSizeMB]);
 
-            item.WriteValues(dataWriter);
+            dataWriter.Write(item);
 
             if (!File.Exists(filePath))
             {
