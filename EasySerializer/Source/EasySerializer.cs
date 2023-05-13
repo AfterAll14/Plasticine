@@ -347,6 +347,9 @@ namespace EasySerializer
 
         public List<T> ReadList<T>() where T : CustomSerializable, new()
         {
+            if (!binaryReader.ReadBoolean())
+                return null;
+
             T[] array = ReadValueArray<T>();
             List<T> list = new List<T>();
             if (array != null)
@@ -647,7 +650,13 @@ namespace EasySerializer
 
         public void Write<T>(List<T> list) where T : CustomSerializable
         {
-            Write(list.ToArray());
+            if (list == null)
+                binaryWriter.Write(false);
+            else
+            {
+                binaryWriter.Write(true);
+                Write(list.ToArray());
+            }
         }
 
         public void Write<T>(T value) where T : CustomSerializable
