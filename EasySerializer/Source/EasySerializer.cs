@@ -35,6 +35,9 @@ namespace EasySerializer
 
         public void ReadFromFile(string filePath)
         {
+            if (!File.Exists(filePath))
+                throw new Exception("File does not exist");
+
             BinaryDataReader dataReader = new BinaryDataReader(File.ReadAllBytes(filePath));
             if (dataReader.ReadBool())
                 ReadValues(dataReader);
@@ -44,6 +47,9 @@ namespace EasySerializer
 
         public void PatchSavedData(string filePath, int maxSizeMB = 32)
         {
+            if (!File.Exists(filePath))
+                throw new Exception("File does not exist");
+
             BinaryDataReader dataReader = new BinaryDataReader(File.ReadAllBytes(filePath));
             ReadValues(dataReader);
             WriteToFile(filePath, maxSizeMB);
@@ -97,6 +103,9 @@ namespace EasySerializer
 
         public static T ReadItemFromFile<T>(string filePath) where T : CustomSerializable, new()
         {
+            if (!File.Exists(filePath))
+                return null;
+
             BinaryDataReader dataReader = new BinaryDataReader(File.ReadAllBytes(filePath));
             T item = dataReader.ReadValue<T>();
 
@@ -105,6 +114,9 @@ namespace EasySerializer
 
         public static T[] ReadItemArrayFromFile<T>(string filePath) where T : CustomSerializable, new()
         {
+            if (!File.Exists(filePath))
+                return null;
+
             BinaryDataReader dataReader = new BinaryDataReader(File.ReadAllBytes(filePath));
             T[] items = dataReader.ReadValueArray<T>();
 
@@ -113,6 +125,9 @@ namespace EasySerializer
 
         public static List<T> ReadItemListFromFile<T>(string filePath) where T : CustomSerializable, new()
         {
+            if (!File.Exists(filePath))
+                return null;
+
             T[] items = ReadItemArrayFromFile<T>(filePath);
             List<T> itemList = new List<T>(items);
 
